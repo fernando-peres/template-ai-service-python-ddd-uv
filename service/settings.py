@@ -1,5 +1,4 @@
 import logging
-from functools import lru_cache
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -26,8 +25,3 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return logging.getLevelNamesMapping()[v.upper()]
         return v
-
-
-@lru_cache(maxsize=1)
-def get_settings() -> Settings:
-    return Settings()

@@ -4,6 +4,7 @@ from functools import lru_cache
 import colorlog
 
 from service.settings import Settings
+from service.shared.terminal import ColorPalette as CP
 
 """
 FastAPI application configuration & initialization.
@@ -49,18 +50,19 @@ def setup_service_logger(
 
     logger = logging.getLogger(service_name)
     logger.info(
-        "Service logger configured with level: %s and service name: %s", level, service_name
+        f"Service logger configured with level: {CP.PRIMARY}%s{CP.RESET}",
+        logging.getLevelName(level),
     )
     return logger
 
 
-class Registry:
+class ServiceRegistry:
     @staticmethod
     def get_logger() -> logging.Logger:
         """
         Get the logger for the service.
         """
-        return logging.getLogger(Registry.get_settings().service_name)
+        return logging.getLogger(ServiceRegistry.get_settings().service_name)
 
     @staticmethod
     @lru_cache(maxsize=1)
@@ -72,10 +74,21 @@ class Registry:
         """
         Register the resources for the application/service.
         """
-        settings = Registry.get_settings()
+        settings = ServiceRegistry.get_settings()
+        setup_third_party_loggers(level=settings.third_party_loggers_level)
         logger = setup_service_logger(
             level=settings.logger_level,
             service_name=settings.service_name,
         )
+        logger.info(
+            f"Third-party loggers set to level: {CP.PRIMARY}%s{CP.RESET}",
+            logging.getLevelName(settings.third_party_loggers_level),
+        )
         logger.info("Initializing resources...")
-        setup_third_party_loggers(level=settings.third_party_loggers_level)
+
+    @staticmethod
+    def cleanup_resources() -> None:
+        """
+        Clean up the resources for the application/service.
+        """
+        pass

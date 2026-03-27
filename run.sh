@@ -36,11 +36,11 @@ fi
 box_row() {
   local visible="$1"
   local colored="$2"
-  local pad=$(( 78 - ${#visible} ))
+  local pad=$(( 79 - ${#visible} ))
   printf "${BOLD}${CYAN}│${RESET}${colored}%${pad}s${BOLD}${CYAN}│${RESET}\n" ""
 }
 
-BORDER="──────────────────────────────────────────────────────────────────────────────"
+BORDER="───────────────────────────────────────────────────────────────────────────────"
 printf "\n"
 printf "${BOLD}${CYAN}┌${BORDER}┐${RESET}\n"
 box_row "  🤖  Starting service: ${SERVICE_NAME}" "  ${BOLD}${GREEN}▶  Starting service:${RESET} ${BOLD}${SERVICE_NAME}${RESET}"

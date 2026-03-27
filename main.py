@@ -3,22 +3,32 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from service import get_settings
 from service.interface.api import health_router
-from service.registry import Registry as Reg
-
-settings = get_settings()
+from service.shared import ColorPalette as CP
+from service.shared import ServiceRegistry as SR
 
 
 def create_service() -> FastAPI:
+    """
+    Create the FastAPI application with configured lifespan and routes.
+    This function sets up the application lifecycle, including resource initialization
+    and cleanup, and includes the necessary API routes.
+    """
+
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
-        # Lazyload: initialize shared resources here in the future
-        Reg.initialize_resources()
-        logger = Reg.get_logger()
-        logger.info("Service is starting up...")
+        """
+        Lifespan context manager for FastAPI application.
+        Lazy load: initialize shared resources here in the future.
+        """
+        SR.initialize_resources()
+        logger = SR.get_logger()
+        logger.info("✅ Service is ready to accept requests")
+        print(f"{CP.PRIMARY}─" * 80 + f" {CP.RESET}")
         yield
-        # Teardown: clean up resources here in the future
+        SR.cleanup_resources()
+        logger.info("🧹 Service resources cleaned up successfully")
+        print("")
 
     app = FastAPI(lifespan=lifespan)
     app.include_router(health_router)

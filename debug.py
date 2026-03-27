@@ -6,7 +6,7 @@ from fastapi import FastAPI
 
 from service import Settings
 from service.interface.api import health_router
-from service.registry import Registry as Reg
+from service.shared.registry import ServiceRegistry as Reg
 
 settings = Settings()
 
