@@ -6,7 +6,7 @@ from fastapi import FastAPI
 
 from service import Settings
 from service.interface.api import health_router
-from service.shared.registry import ServiceRegistry as Reg
+from service.shared.registry import ServiceRegistry as SR
 
 settings = Settings()
 
@@ -14,8 +14,8 @@ settings = Settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     # Lazyload: initialize shared resources here in the future
-    Reg.initialize_resources()
-    logger = Reg.get_logger()
+    SR.initialize_resources()
+    logger = SR.get_logger()
     logger.info("Service is starting up...")
     yield
     # Teardown: clean up resources here in the future
