@@ -1,0 +1,55 @@
+name: ${SERVICE_NAME}
+
+services:
+  api:
+    container_name: ${SERVICE_NAME}-worker
+    image: ${SERVICE_NAME}-img
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "${HOST_IP}:${PORT}:${PORT}"
+    env_file:
+      - ../.env
+    environment:
+      - PYTHONPATH=/app/service
+    volumes:
+      - ../service:/app/service
+    command: >
+      uvicorn main:create_service --host ${HOST_IP} --port ${PORT} --factory
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    restart: unless-stopped
+    networks:
+      - service-network
+
+  # docker compose --profile local up
+  postgres:
+    image: postgres:16
+    container_name: postgres_db
+    restart: unless-stopped
+    profiles: ["local"]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    networks:
+      - service-network
+
+volumes:
+  pgdata:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $POSTGRES_DATA_VOLUME
+
+networks:
+  service-network:

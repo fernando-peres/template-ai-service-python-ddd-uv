@@ -1,0 +1,29 @@
+name: ${SERVICE_NAME}
+
+services:
+  api:
+    container_name: ${SERVICE_NAME}-worker
+    image: ${SERVICE_NAME}-img
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "${HOST_IP}:${PORT}:${PORT}"
+    env_file:
+      - ../.env
+    environment:
+      - PYTHONPATH=/app/service
+    volumes:
+      - ../service:/app/service
+    command: >
+      uvicorn main:create_service --host ${HOST_IP} --port ${PORT} --factory
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    restart: unless-stopped
+    networks:
+      - service-network
+networks:
+  service-network:
