@@ -9,6 +9,7 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
     )
 
+    service_name: str = "no-service-name-defined"
     openrouter_api_key: str = ""
     open_ai_key: str = ""
     perplexity_api_key: str = ""
