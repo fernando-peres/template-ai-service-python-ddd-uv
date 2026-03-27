@@ -1,0 +1,1 @@
+# template-ai-service-python-ddd-uv
