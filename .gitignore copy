@@ -1,0 +1,67 @@
+# Environment variables
+.env
+.env.local.*
+
+prompts/
+.prompts/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+.editorconfig
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# Claude worktrees (embedded repos)
+.claude/worktrees/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.iml
+.coverage
+coverage.lcov
+# OS
+.DS_Store
+Thumbs.db
+
+# Data files
+data/
+output/
+
+# Local file system (thumbnails, etc.)
+file_system/*
+!file_system/.gitkeep
+
+# SQLite local databases
+db/*.db
+
+.env.local
+.env.dev
+.env.stage
+.env.prd
