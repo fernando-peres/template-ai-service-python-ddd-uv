@@ -64,6 +64,7 @@ exclude = [
     ".github",
     ".vscode",
     ".cursor",
+    ".claude",
     "static",
 ]
 src = [".", "service", "tests"]
@@ -95,6 +96,7 @@ exclude = [
     "(list|create)/bin",
     "^(\\.venv|env|venv|list|create)/",
     "^scripts/",  # Ignore scripts folder and all subfolders
+    "^\\.claude/",
     "^(?!src/|tests/|main\\.py|config\\.py).*",
 ]
 ignore_missing_imports = true

@@ -5,10 +5,11 @@ repos:
     - id: ruff
       name: Ruff lint check
       args: ["--config=pyproject.toml"]
+      exclude: ^\.claude/
     - id: ruff-format
       name: Ruff formatter
       args: ["--config=pyproject.toml"]
-      exclude: ^scripts/
+      exclude: ^(scripts/|\.claude/)
 
 - repo: https://github.com/pre-commit/mirrors-mypy
   rev: v1.18.2
@@ -18,7 +19,7 @@ repos:
       additional_dependencies:
         - types-requests
       args: ["--config-file=pyproject.toml"]
-      exclude: ^scripts/
+      exclude: ^(scripts/|\.claude/)
 
 - repo: local
   hooks:

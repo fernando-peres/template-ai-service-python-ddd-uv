@@ -1,42 +1,85 @@
-# Claude Code configuration for this project
+# CLAUDE.md
 
-Rules and skills in the `.cursor/` folder guide the AI. **Rules** are applied automatically when relevant; **skills** are discovered from descriptions and can be invoked with `/skill-name` or when the task matches.
+## Setup
 
----
+```bash
+uv sync --all-groups       # Install all dependencies
+source .venv/bin/activate  # Activate virtual environment
+pre-commit install         # Install git hooks
+cp .env.example .env       # Configure environment variables
+```
 
-## Rules (`.cursor/rules/`)
+## Running the Service
 
-Read these before starting any task. They are included in context by Cursor when they apply.
+```bash
+./run.sh                   # Start locally (reads .env, validates required vars)
+```
 
-| File | Purpose |
-|------|--------|
-| `.cursor/rules/python.mdc` | Python standards: ruff (format/lint), mypy, pytest, line length 98, double quotes, **uv** for deps. Applies to `**/*.py`. |
-| `.cursor/rules/specs-consultation.mdc` | Always consult `docs/specs/` before implementing; create or update specs when code changes; check `docs/adr/` for architecture decisions. |
+Required env vars: `SERVICE_NAME`, `HOST_IP`, `PORT`
 
----
+## Development Commands
 
-## Skills (`.cursor/skills/`)
+```bash
+uv run ruff check .        # Lint
+uv run ruff format .       # Format
+uv run mypy .              # Type check (strict mode)
+uv run pytest              # Run tests with coverage
+```
 
-Consult when the task matches the description. The AI uses skill descriptions to decide relevance.
+## Docker
 
-| Skill | Path | When to use |
-|-------|------|-------------|
-| **edit-mermaid-markdown** | `.cursor/skills/edit-mermaid-markdown/SKILL.md` | Mermaid diagrams, flowcharts, sequence diagrams, documenting flows/architecture; fixing Mermaid parse errors in markdown. |
-| **python-logger** | `.cursor/skills/python-logger/SKILL.md` | Adding or reviewing logging; avoid `logging.getLogger()` and `self.logger`; use injected logger at method level. |
-| **python-uv** | `.cursor/skills/python-uv/SKILL.md` | Running Python, installing dependencies, setting up the venv; project uses `uv` (see `pyproject.toml`, `uv.lock`). |
-| **python-fastapi** | `.cursor/skills/python-fastapi/SKILL.md` | Creating or reviewing FastAPI endpoints, use cases, or DTOs; Clean Architecture; `request.app.state.container`, no `Depends()`. |
-| **python-postgres-repository** | `.cursor/skills/python-postgres-repository/SKILL.md` | Postgres repositories with SQLAlchemy (sync); session per method via `get_session()`; ORM→entity mapping; domain exceptions. |
-| **python-repository** | `.cursor/skills/python-repository/SKILL.md` | Repository pattern: try-except-finally, session injection, commit/rollback, raising domain exceptions from repositories. |
-| **mcp** | `.cursor/skills/mcp/SKILL.md` | Adding or moving MCP servers (interface) or clients (infrastructure); integrating with Anthropic/FastMCP. |
-| **python-dto-naming** | `.cursor/skills/python-dto-naming/SKILL.md` | DTO naming: use cases → `*Command`/`*Result`; gateways/endpoints → `*Request`/`*Response`. |
-| **python-dev-use-case** | `.cursor/skills/python-dev-use-case/SKILL.md` | Implementing or adding a use case; working from specs in `docs/specs/usecases/`; spec-first workflow. |
-| **python-exceptions** | `.cursor/skills/python-exceptions/SKILL.md` | Domain exceptions in `service/shared/exceptions.py`; not-found in repositories; mapping exceptions to HTTP in FastAPI. |
-| **pytest** | `.cursor/skills/pytest/SKILL.md` | Writing, reviewing, or running tests; `conftest.py`; pytest markers and `parametrize`; project test commands. |
+```bash
+# Standard
+docker compose -f docker/docker-compose.yaml --env-file .env up --build
 
----
+# With PostgreSQL
+docker compose -f docker/docker-compose-with-psql.yaml --env-file .env --profile local up --build
 
-## Using this configuration
+# Teardown
+docker compose -f docker/docker-compose.yaml --env-file .env down -v
+```
 
-- **Rules**: Cursor includes rule files in the model context when they match (e.g. `python.mdc` for `.py` files). You can also say: *"Before we start, read all files in .cursor/rules/ and .cursor/skills/."*
-- **Skills**: The agent discovers skills from `.cursor/skills/` and uses their descriptions to choose when to read a skill. You can invoke one explicitly in chat with `/skill-name` (e.g. `/python-fastapi`).
-- This setup works **when you use Cursor in this repo**: rules and skills under `.cursor/` are picked up by Cursor’s AI so it can follow project conventions and use the documented workflows online during your session.
+## Architecture (DDD)
+
+```
+service/
+├── core/          # Domain logic — entities, value objects, domain services
+├── application/   # Use cases — orchestrates domain, defines DTOs
+├── infra/         # Infrastructure — DB models, external adapters
+├── interface/     # Entry points — FastAPI routers (api/), CLI
+└── shared/        # Cross-cutting — ServiceRegistry (DI), logger, exceptions
+```
+
+**Dependency direction:** `interface` → `application` → `core` ← `infra`
+
+- Add new routes in `service/interface/api/`
+- Add use cases in `service/application/`
+- Add domain logic in `service/core/`
+- Add DB models in `service/infra/db/models.py`
+- Register shared resources in `service/shared/registry.py`
+
+## Key Conventions
+
+- **Python 3.13+**, strict MyPy — all code must be fully typed
+- **Line length:** 98 (Ruff)
+- **Imports:** sorted by Ruff (isort-compatible)
+- **Async:** `asyncio_mode = auto` — pytest tests can be async by default
+- **Settings:** all config via `service/settings.py` (Pydantic Settings), never hardcode
+- **Logging:** use `setup_service_logger` from `service/shared`; don't use `print()`
+
+## Adding Dependencies
+
+```bash
+uv add <package>           # Production dependency
+uv add --dev <package>     # Dev-only dependency
+```
+
+## Pre-commit Hooks
+
+Runs automatically on `git commit`: ruff lint → ruff format → mypy → pytest (manual stage).
+
+To run manually:
+```bash
+pre-commit run --all-files
+pre-commit run --hook-stage manual  # includes pytest
+```
