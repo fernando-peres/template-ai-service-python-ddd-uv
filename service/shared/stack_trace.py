@@ -14,12 +14,12 @@ your functions/files.
 import sys
 import traceback
 
-from service.shared.registry import ServiceRegistry as SR
+from service.shared.logger import get_logger
 from service.shared.terminal import ColorCode
 
 
 def log_stack_trace() -> None:  # pragma: no cover
-    logger = SR.get_logger()
+    logger = get_logger()
     exc_type, exc_value, exc_tb = sys.exc_info()
     tb = traceback.extract_tb(exc_tb)
     last_call = tb[-1]  # The last item is where the exception happened

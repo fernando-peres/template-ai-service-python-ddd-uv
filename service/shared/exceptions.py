@@ -2,7 +2,7 @@
 Exceptions for the service.
 """
 
-from service.shared.registry import ServiceRegistry
+from service.shared.logger import get_logger
 
 
 class EventAlreadyExists(Exception):
@@ -11,6 +11,28 @@ class EventAlreadyExists(Exception):
             f"Event with id '{id}' already exists.",
         )
         self.id = id
+
+
+# ------------------------------------------------------------
+# Account Exceptions
+# ------------------------------------------------------------
+class AccountNotFound(Exception):
+    """Account not found by slug (username) or display_name."""
+
+    def __init__(self, identifier: str) -> None:
+        super().__init__(f"Account '{identifier}' not found.")
+        self.identifier = identifier
+
+
+# ------------------------------------------------------------
+# Group Exceptions
+# ------------------------------------------------------------
+class GroupNotFound(Exception):
+    """Group not found by slug."""
+
+    def __init__(self, identifier: str) -> None:
+        super().__init__(f"Group '{identifier}' not found.")
+        self.identifier = identifier
 
 
 # ------------------------------------------------------------
@@ -99,7 +121,7 @@ def handle_exception(exception: Exception) -> None:
     """
     Standandar way to deal with exceptions
     """
-    logger = ServiceRegistry.get_logger()
+    logger = get_logger()
     logger.error(
         f"Error: {exception}",
         exc_info=True,

@@ -1,7 +1,6 @@
+from service.shared.logger import LoggerSetup, get_logger
 from service.shared.registry import (
     ServiceRegistry,
-    setup_service_logger,
-    setup_third_party_loggers,
 )
 from service.shared.stack_trace import log_stack_trace
 from service.shared.terminal import (
@@ -13,11 +12,11 @@ from service.shared.terminal import (
 
 __all__ = [
     "ServiceRegistry",
-    "setup_service_logger",
-    "setup_third_party_loggers",
     "log_stack_trace",
+    "LoggerSetup",
     "ColorCode",
     "ColorPalette",
     "coloring",
     "service_message",
+    "get_logger",
 ]

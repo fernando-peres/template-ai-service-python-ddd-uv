@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from service.interface.api import health_router
 from service.shared import ColorPalette as CP
 from service.shared import ServiceRegistry as SR
+from service.shared import get_logger
 
 
 def create_service() -> FastAPI:
@@ -22,7 +23,7 @@ def create_service() -> FastAPI:
         Lazy load: initialize shared resources here in the future.
         """
         SR.initialize_resources()
-        logger = SR.get_logger()
+        logger = get_logger()
         logger.info("✅ Service is ready to accept requests")
         print(f"{CP.PRIMARY}─" * 80 + f" {CP.RESET}")
         yield
