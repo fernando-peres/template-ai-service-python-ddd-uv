@@ -43,18 +43,18 @@ docker compose -f docker/docker-compose.yaml --env-file .env down -v
 
 ```
 service/
-├── core/          # Domain logic — entities, value objects, domain services
+├── domain/        # Domain logic — entities, value objects, domain services
 ├── application/   # Use cases — orchestrates domain, defines DTOs
 ├── infra/         # Infrastructure — DB models, external adapters
 ├── interface/     # Entry points — FastAPI routers (api/), CLI
 └── shared/        # Cross-cutting — ServiceRegistry (DI), logger, exceptions
 ```
 
-**Dependency direction:** `interface` → `application` → `core` ← `infra`
+**Dependency direction:** `interface` → `application` → `domain` ← `infra`
 
 - Add new routes in `service/interface/api/`
 - Add use cases in `service/application/`
-- Add domain logic in `service/core/`
+- Add domain logic in `service/domain/`
 - Add DB models in `service/infra/db/models.py`
 - Register shared resources in `service/shared/registry.py`
 
@@ -83,3 +83,12 @@ To run manually:
 pre-commit run --all-files
 pre-commit run --hook-stage manual  # includes pytest
 ```
+
+## When task is completed
+
+When you finish a task inform in claude code extentions or CLI
+
+Print:
+╔═══════════════════════════════════════════════════════════╗
+║  🤖  Claude  ·  ✅  All tasks executed successfully        ║
+╚═══════════════════════════════════════════════════════════╝
