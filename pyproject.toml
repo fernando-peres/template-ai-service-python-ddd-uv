@@ -67,7 +67,7 @@ exclude = [
     ".claude",
     "static",
 ]
-src = [".", "service", "tests"]
+src = ["src", "tests"]
 
 [tool.ruff.format]
 indent-style = "space"
@@ -101,14 +101,14 @@ exclude = [
 ]
 ignore_missing_imports = true
 explicit_package_bases = true
-mypy_path = "/service"
+mypy_path = "src"
 disable_error_code = ["misc"]
 
 # -------------------------------------------------------------------------------------
 # PyTest
 # -------------------------------------------------------------------------------------
 [tool.pytest.ini_options]
-pythonpath = [".", "service"]
+pythonpath = ["src"]
 addopts = [
     "--cov=main",
     "--cov-report=term-missing",

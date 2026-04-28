@@ -49,4 +49,4 @@ box_row "  Port  →  ${PORT}" "  ${CYAN}Port${RESET}  →  ${PORT}"
 printf "${BOLD}${CYAN}└${BORDER}┘${RESET}\n"
 printf "\n"
 
-uv run uvicorn main:create_service --host "$HOST_IP" --port "$PORT" --factory
+PYTHONPATH=src uv run uvicorn main:create_service --host "$HOST_IP" --port "$PORT" --factory

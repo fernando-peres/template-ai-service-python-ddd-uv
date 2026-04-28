@@ -41,22 +41,32 @@ docker compose -f docker/docker-compose.yaml --env-file .env down -v
 
 ## Architecture (DDD)
 
+Source code lives under `src/` (not part of the import path):
+
 ```
-service/
-├── domain/        # Domain logic — entities, value objects, domain services
-├── application/   # Use cases — orchestrates domain, defines DTOs
-├── infra/         # Infrastructure — DB models, external adapters
-├── interface/     # Entry points — FastAPI routers (api/), CLI
-└── shared/        # Cross-cutting — ServiceRegistry (DI), logger, exceptions
+src/
+├── main.py        # FastAPI app factory entry point
+└── service/
+    ├── domain/        # Domain logic — entities, value objects, domain services
+    ├── application/   # Use cases — orchestrates domain, defines DTOs
+    ├── infra/         # Infrastructure — DB models, external adapters
+    ├── interface/     # Entry points — FastAPI routers (api/), CLI
+    └── shared/        # Cross-cutting — ServiceRegistry (DI), logger, exceptions
 ```
 
 **Dependency direction:** `interface` → `application` → `domain` ← `infra`
 
-- Add new routes in `service/interface/api/`
-- Add use cases in `service/application/`
-- Add domain logic in `service/domain/`
-- Add DB models in `service/infra/db/models.py`
-- Register shared resources in `service/shared/registry.py`
+Imports use the package name directly (not prefixed with `src`):
+```python
+from service.interface.api import health_router   # ✅
+from src.service.interface.api import ...         # ❌
+```
+
+- Add new routes in `src/service/interface/api/`
+- Add use cases in `src/service/application/`
+- Add domain logic in `src/service/domain/`
+- Add DB models in `src/service/infra/db/models.py`
+- Register shared resources in `src/service/shared/registry.py`
 
 ## Key Conventions
 
@@ -64,7 +74,7 @@ service/
 - **Line length:** 98 (Ruff)
 - **Imports:** sorted by Ruff (isort-compatible)
 - **Async:** `asyncio_mode = auto` — pytest tests can be async by default
-- **Settings:** all config via `service/settings.py` (Pydantic Settings), never hardcode
+- **Settings:** all config via `src/service/settings.py` (Pydantic Settings), never hardcode
 - **Logging:** use `setup_service_logger` from `service/shared`; don't use `print()`
 
 ## Adding Dependencies
@@ -84,11 +94,17 @@ pre-commit run --all-files
 pre-commit run --hook-stage manual  # includes pytest
 ```
 
+**IMPORTANT:** If there are any errors, fix them before finishing. Do not skip this step.
+
+
 ## When task is completed
 
 When you finish a task inform in claude code extentions or CLI
 
 Print:
+
+🤖
 ╔═══════════════════════════════════════════════════════════╗
-║  🤖  Claude  ·  ✅  All tasks executed successfully        ║
+║         Claude  -   All tasks executed successfully       ║
 ╚═══════════════════════════════════════════════════════════╝
+✅
